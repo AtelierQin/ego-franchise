@@ -17,12 +17,13 @@ export interface Announcement {
   content: string; // 内容 (支持Markdown或简单富文本)
   attachmentUrl?: string; // 附件链接 (Supabase Storage URL)
   publisherId: string; // 发布人ID (HQ Ops/Admin)
+  publisherName?: string; // 发布人姓名
   publishDate: string; // 发布时间 (ISO 8601 string)
   importance: AnnouncementImportance; // 重要等级
   targetAudience: 'all_franchisees' | string[]; // 接收对象: 'all_franchisees' 或加盟商ID列表
-  // readByFranchisees: string[]; // 已读加盟商ID列表 (通过单独的表或关联实现更佳)
-  createdAt: string;
-  updatedAt: string;
+  readByFranchisees?: string[]; // 已读加盟商ID列表
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 /**
