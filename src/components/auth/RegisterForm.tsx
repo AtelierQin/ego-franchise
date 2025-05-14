@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { UserRole } from '../../lib/supabase';
+import { UserRole } from './AuthContext'; // Corrected import path for UserRole
 
 interface RegisterFormProps {
   onSuccess?: () => void;
@@ -11,8 +11,8 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [city, setCity] = useState('');
+  // const [phone, setPhone] = useState(''); // Removed phone state
+  // const [city, setCity] = useState('');   // Removed city state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,9 +35,7 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
         password,
         options: {
           data: {
-            name,
-            phone,
-            city,
+            full_name: name, // Pass name as full_name for the new_user_trigger
             role: UserRole.APPLICANT, // 默认注册为意向加盟商
           },
         },
@@ -101,35 +99,8 @@ const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
           />
         </div>
         
-        <div className="mb-4">
-          <label htmlFor="phone" className="block text-gray-700 text-sm font-medium mb-2">
-            联系电话
-          </label>
-          <input
-            id="phone"
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-            placeholder="请输入您的联系电话"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label htmlFor="city" className="block text-gray-700 text-sm font-medium mb-2">
-            意向城市
-          </label>
-          <input
-            id="city"
-            type="text"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-            placeholder="请输入您的意向城市"
-            required
-          />
-        </div>
+        {/* Phone input removed */}
+        {/* City input removed */}
         
         <div className="mb-4">
           <label htmlFor="password" className="block text-gray-700 text-sm font-medium mb-2">

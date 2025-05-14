@@ -12,6 +12,7 @@ interface AnnouncementListProps {
   onMarkAsRead?: (announcementId: string) => void; // For Franchisee
   onEdit?: (announcement: Announcement) => void; // For HQ Ops/Admin
   onDelete?: (announcementId: string) => void; // For HQ Ops/Admin
+  onViewStats?: (announcement: Announcement) => void; // For HQ Ops/Admin to view read statistics
   userRole: 'franchisee' | 'hq_ops_admin';
   readAnnouncementIds?: string[]; // For Franchisee to show read status
 }
@@ -33,6 +34,7 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
   onMarkAsRead,
   onEdit,
   onDelete,
+  onViewStats, // Add onViewStats to destructured props
   userRole,
   readAnnouncementIds = [],
 }) => {
@@ -96,6 +98,11 @@ const AnnouncementList: React.FC<AnnouncementListProps> = ({
                   {userRole === 'hq_ops_admin' && onDelete && (
                     <Button variant="destructive" size="sm" onClick={() => onDelete(announcement.id)}>
                       删除
+                    </Button>
+                  )}
+                  {userRole === 'hq_ops_admin' && onViewStats && (
+                    <Button variant="outline" size="sm" onClick={() => onViewStats(announcement)}>
+                      查看统计
                     </Button>
                   )}
                 </TableCell>

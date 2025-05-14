@@ -5,6 +5,14 @@ import FinanceManagementPage from './components/finance/FinanceManagementPage';
 import InspectionManagementPage from './components/inspection/InspectionManagementPage';
 import AnnouncementManagementPage from './pages/AnnouncementManagementPage';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage'; // 新增导入
+import NewApplicationPage from './pages/application/NewApplicationPage'; // 新增导入
+import ApplicationReviewPage from './pages/hq/ApplicationReviewPage'; // 新增导入
+// import RoleManagementPage from './pages/admin/RoleManagementPage'; // File does not exist
+// UserManagementPage is already imported above if this is a retry, ensure it's present
+import UserManagementPage from './pages/admin/UserManagementPage'; 
+import SystemConfigurationPage from './pages/admin/SystemConfigurationPage';
+import ContractTemplateManagementPage from './pages/admin/ContractTemplateManagementPage'; // 新增导入
 import { AuthProvider, useAuth, ProtectedRoute, UserRole } from '@/components/auth/AuthContext';
 
 
@@ -50,6 +58,19 @@ const AppWithAuth = () => {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/auth/register" element={<RegisterPage />} /> {/* 新增注册页面路由 */}
+
+      <Route path="/application/new" element={
+        <ProtectedRouteWithLayout allowedRoles={[UserRole.APPLICANT]}>
+          <NewApplicationPage />
+        </ProtectedRouteWithLayout>
+      } />
+
+      <Route path="/hq/applications" element={
+        <ProtectedRouteWithLayout allowedRoles={[UserRole.HQ_RECRUITER, UserRole.ADMIN]}>
+          <ApplicationReviewPage />
+        </ProtectedRouteWithLayout>
+      } />
       
       <Route path="/" element={
         <ProtectedRouteWithLayout>
@@ -80,6 +101,21 @@ const AppWithAuth = () => {
           <AnnouncementManagementPage />
         </ProtectedRouteWithLayout>
       } />
+      <Route path="/admin/*" element={ // Changed to allow nested routes to render Outlet correctly
+        <ProtectedRouteWithLayout allowedRoles={[UserRole.ADMIN, UserRole.HQ_RECRUITER]}> {/* HQ_RECRUITER can also access some admin pages like contract templates */} 
+          <Outlet />
+        </ProtectedRouteWithLayout>
+      }>
+        <Route index element={<Navigate to="users" replace />} />
+        {/* <Route path="roles" element={<RoleManagementPage />} /> // File does not exist */}
+        <Route path="users" element={<UserManagementPage />} />
+        <Route path="system-configurations" element={<SystemConfigurationPage />} />
+        <Route path="contract-templates" element={<ContractTemplateManagementPage />} /> {/* 新增合同模板管理路由 */}
+        {/* Ensure UserManagementPage route is correctly placed if it was missing or misplaced */} 
+      </Route>
+      {/* Add other routes here */}
+      <Route path="*" element={<Navigate to="/" replace />} /> {/* Catch-all route */}
+      </Route>
       {/* Add other routes here */}
     </Routes>
   );
@@ -87,6 +123,7 @@ const AppWithAuth = () => {
 
 // 主应用组件，包含认证提供者
 function App() {
+  // const { user, profile, loading, hasRole } = useAuth(); // This line seems to be a commented out remnant, ensure it's not causing issues if uncommented elsewhere.
   return (
     <AuthProvider>
       <AppWithAuth />

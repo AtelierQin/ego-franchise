@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
+import { useAuth } from '../auth/AuthContext'; // 导入 useAuth
 
 interface Ticket {
   id: string;
@@ -463,6 +464,7 @@ export const TicketDetail: React.FC = () => {
 };
 
 export const CreateTicket: React.FC = () => {
+  const { user } = useAuth(); // 获取当前用户
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
@@ -506,20 +508,24 @@ export const CreateTicket: React.FC = () => {
       
       if (attachments.length > 0) {
         for (const file of attachments) {
-          const fileName = `${Date.now()}-${file.name}`;
+          const fileName = `${user?.id || 'unknown_user'}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9_.-]/g, '_')}`;
+          const filePath = `ticket-attachments/${fileName}`;
           const { data, error: uploadError } = await supabase.storage
-            .from('ticket-attachments')
-            .upload(`user-uploads/${fileName}`, file);
+            .from('ego-franchise-bucket') // 使用实际的 bucket 名称
+            .upload(filePath, file);
 
           if (uploadError) throw uploadError;
           
           // 获取公共URL
           const { data: urlData } = supabase.storage
-            .from('ticket-attachments')
-            .getPublicUrl(`user-uploads/${fileName}`);
+            .from('ego-franchise-bucket') // 使用实际的 bucket 名称
+            .getPublicUrl(filePath);
             
           if (urlData?.publicUrl) {
             attachmentUrls.push(urlData.publicUrl);
+          } else {
+            console.warn('Could not get public URL for uploaded file:', filePath);
+            // 可以选择抛出错误或记录下来，取决于业务需求
           }
         }
       }
@@ -532,7 +538,7 @@ export const CreateTicket: React.FC = () => {
             title: formData.title,
             category: formData.category,
             description: formData.description,
-            user_id: 'current_user_id', // 需要替换为实际的用户ID
+            user_id: user?.id, // 使用实际的用户ID
             status: 'pending',
             attachments: attachmentUrls.length > 0 ? attachmentUrls : null
           }

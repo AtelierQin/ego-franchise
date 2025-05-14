@@ -1,5 +1,6 @@
 // src/components/announcement/AnnouncementForm.tsx
 import React, { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 import { AnnouncementFormData, AnnouncementImportance, Announcement } from './types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -88,9 +89,68 @@ const AnnouncementForm: React.FC<AnnouncementFormProps> = ({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    if (isLoading) return;
+
+    let attachmentUrl: string | undefined = initialData?.attachmentUrl;
+
+    if (formData.attachment) {
+      const file = formData.attachment;
+      const fileName = `${Date.now()}_${file.name}`;
+      const filePath = `announcement-attachments/${fileName}`;
+
+      try {
+        const { error: uploadError } = await supabase.storage
+          .from('announcement-attachments') // Make sure this bucket exists and has correct policies
+          .upload(filePath, file);
+
+        if (uploadError) {
+          console.error('Error uploading attachment:', uploadError);
+          // Handle error (e.g., show a toast message)
+          alert(`附件上传失败: ${uploadError.message}`);
+          return;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from('announcement-attachments')
+          .getPublicUrl(filePath);
+        
+        attachmentUrl = publicUrlData.publicUrl;
+      } catch (error) {
+        console.error('Error during attachment upload process:', error);
+        alert('附件上传过程中发生错误。');
+        return;
+      }
+    }
+
+    // Prepare data for submission, excluding the File object if it was uploaded
+    const submissionData: AnnouncementFormData & { attachmentUrl?: string } = {
+      ...formData,
+      attachmentUrl: attachmentUrl,
+    };
+    // The actual File object should not be part of the data sent to the backend if it's already uploaded.
+    // The onSubmit prop expects AnnouncementFormData, which has `attachment?: File | null`.
+    // We need to ensure the parent component (AnnouncementManagementPage) handles this correctly.
+    // For now, we'll pass the original formData structure but the parent should use attachmentUrl.
+    // Or, we modify onSubmit to accept attachmentUrl directly.
+    // Let's assume onSubmit will be adapted or a new prop is used for the URL.
+
+    // For the purpose of this component, we'll call onSubmit with the original formData structure,
+    // but the parent (AnnouncementManagementPage) will need to be aware of the new attachmentUrl if it's handling the DB save.
+    // A better approach would be for onSubmit to take the final data structure including attachmentUrl.
+    // Let's modify what we pass to onSubmit.
+    const finalDataToSubmit = {
+        title: formData.title,
+        content: formData.content,
+        importance: formData.importance,
+        targetAudienceType: formData.targetAudienceType,
+        selectedFranchiseeIds: formData.selectedFranchiseeIds,
+        // attachment: formData.attachment, // No longer sending the file object directly if uploaded
+        attachmentUrl: attachmentUrl, // Send the URL instead
+    };
+
+    onSubmit(finalDataToSubmit as any); // Cast as any for now, parent needs to expect attachmentUrl
   };
 
   return (

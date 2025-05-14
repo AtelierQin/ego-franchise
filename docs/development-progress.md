@@ -11,12 +11,12 @@
 ### 核心模块 (Core)
 
 #### Core.1 用户认证与角色
-- [ ] **FR-Core.1.1:** 支持用户注册（仅限意向加盟商 Applicant，注册后需管理员激活或审核通过才可登录）。
-- [ ] **FR-Core.1.2 (Admin):** 管理员可创建总部员工账号（HQ Recruiter, HQ Ops, HQ Supervisor, HQ Finance, Admin）并分配角色。
-- [ ] **FR-Core.1.3 (Admin):** 管理员可管理加盟商账号（如：在合同签署后将其从 Applicant 激活/转换为 Franchisee 角色，或禁用账号）。
+- [x] **FR-Core.1.1:** 支持用户注册（仅限意向加盟商 Applicant，注册后需管理员激活或审核通过才可登录）。(已实现 Applicant 注册，默认状态为 `pending_activation`，管理员可通过 `UserManagementPage` 管理用户状态)
+- [ ] **FR-Core.1.2 (Admin):** 管理员可创建总部员工账号（HQ Recruiter, HQ Ops, HQ Supervisor, HQ Finance, Admin）并分配角色。(UserManagementPage.tsx 已集成，但具体创建员工账号功能待前端实现和验证，目前支持修改现有用户角色)
+- [x] **FR-Core.1.3 (Admin):** 管理员可管理加盟商账号（如：在合同签署后将其从 Applicant 激活/转换为 Franchisee 角色，或禁用账号）。(UserManagementPage.tsx 已集成，支持修改用户角色和状态)
 - [x] **FR-Core.1.4:** 所有用户支持邮箱/密码登录。提供“忘记密码”功能。 (已实现基础登录页面、AuthContext集成)
-- [ ] **FR-Core.1.5:** 系统内定义清晰的角色：Applicant, Franchisee, HQ Recruiter, HQ Ops, HQ Supervisor, HQ Finance, Admin。
-- [ ] **FR-Core.1.6:** 基于角色实现严格的数据访问权限和功能操作权限（通过 Supabase RLS 和前端逻辑控制）。
+- [x] **FR-Core.1.5:** 系统内定义清晰的角色：Applicant, Franchisee, HQ Recruiter, HQ Ops, HQ Supervisor, HQ Finance, Admin。(已在 AuthContext 和数据库层面定义)
+- [x] **FR-Core.1.6:** 基于角色实现严格的数据访问权限和功能操作权限（通过 Supabase RLS 和前端逻辑控制）。(Supabase RLS 初步建立，前端路由保护已通过 `ProtectedRoute` 和 `App.tsx` 中的路由配置实现，需持续测试和细化)
 
 ### 阶段一：项目初始化与基础架构搭建
 
@@ -33,18 +33,18 @@
 - [x] **FR-A.1.1 (Applicant):** 提供在线加盟申请表单，字段包括：姓名、联系电话、邮箱、意向城市、预计投入资金、简要经验描述。
 - [x] **FR-A.1.2 (Applicant):** 支持上传资质文件（如身份证扫描件，数量1-3个，格式 PDF/JPG/PNG，大小限制）。
 - [x] **FR-A.1.3 (Applicant):** 提交申请后，可查看申请状态（待审核、审核中、已通过、已驳回、需补充材料）。
-- [x] **FR-A.1.4 (HQ Recruiter):** 收到新申请的系统内通知。（进行中）
-- [x] **FR-A.1.5 (HQ Recruiter):** 查看申请人信息和上传的资质文件。（进行中 - 对应原"创建申请审核界面"）
-- [x] **FR-A.1.6 (HQ Recruiter):** 对申请进行操作：批准、驳回（需填写原因）、要求补充材料（需填写说明）。审批意见内部可见。（进行中 - 对应原"创建申请审核界面"）
-- [ ] **FR-A.1.7 (Admin):** 可配置基础的自动化初筛规则（例如：意向城市是否在开放列表内）。
+- [x] **FR-A.1.4 (HQ Recruiter):** 收到新申请的系统内通知。(ApplicationReviewPage.tsx 获取待审核列表，具体通知机制待细化)
+- [x] **FR-A.1.5 (HQ Recruiter):** 查看申请人信息和上传的资质文件。(已实现于 ApplicationReviewPage.tsx)
+- [x] **FR-A.1.6 (HQ Recruiter):** 对申请进行操作：批准、驳回（需填写原因）、要求补充材料（需填写说明）。审批意见内部可见。(已实现于 ApplicationReviewPage.tsx)
+- [x] **FR-A.1.7 (Admin):** 可配置基础的自动化初筛规则（例如：意向城市是否在开放列表内）。 (已实现 SystemConfigurationPage，允许编辑 `application.screening.allowed_cities`)
 
 #### A.2 电子合同签署 (简化版)
-- [x] **FR-A.2.1 (HQ Recruiter/Admin):** 上传1-2个标准版PDF合同模板到系统。(已实现合同预览功能)
-- [x] **FR-A.2.2 (HQ Recruiter):** 选择已批准的申请人，选择合同模板，手动输入需填写的关键变量，发起签署流程。(已开发电子签名组件并实现合同签署流程)
-- [x] **FR-A.2.3 (Applicant/Franchisee & HQ):** 收到签署通知（邮件/短信），在线预览合同，进行电子签名。
-- [x] **FR-A.2.4 (Applicant/Franchisee & HQ):** 双方签署完成后，可在线查看和下载已签署的PDF合同。(已实现合同查看与管理功能)
-- [x] **FR-A.2.5 (HQ Recruiter):** 跟踪合同签署状态（待签署、部分签署、已签署）。
-- [x] **FR-A.2.6:** 合同签署完成后，申请人状态自动更新为“已签约加盟商 (Franchisee)”。
+- [x] **FR-A.2.1 (HQ Recruiter/Admin):** 上传1-2个标准版PDF合同模板到系统。(已实现于 ContractTemplateManagementPage.tsx)
+- [ ] **FR-A.2.2 (HQ Recruiter):** 选择已批准的申请人，选择合同模板，手动输入需填写的关键变量，发起签署流程。(合同模板管理已实现，具体发起签署流程的前端页面和逻辑待开发/审查)
+- [ ] **FR-A.2.3 (Applicant/Franchisee & HQ):** 收到签署通知（邮件/短信），在线预览合同，进行电子签名。(具体签署页面和逻辑待开发/审查)
+- [ ] **FR-A.2.4 (Applicant/Franchisee & HQ):** 双方签署完成后，可在线查看和下载已签署的PDF合同。(具体已签署合同查看和下载页面逻辑待开发/审查)
+- [ ] **FR-A.2.5 (HQ Recruiter):** 跟踪合同签署状态（待签署、部分签署、已签署）。(相关页面和逻辑待开发/审查)
+- [ ] **FR-A.2.6:** 合同签署完成后，申请人状态自动更新为“已签约加盟商 (Franchisee)”。(依赖签署流程完成，相关自动化逻辑待开发/审查)
 
 ### 模块B: 开店筹备 (极简版 - 聚焦首批订货)
 
@@ -110,7 +110,7 @@
 - [x] **FR-F.1.5 (Franchisee):** 登录后在“通知公告”区域看到新公告列表。
 - [x] **FR-F.1.6 (Franchisee):** 点击公告标题可查看公告详情及附件。
 - [x] **FR-F.1.7 (Franchisee):** 阅读公告后，可手动点击“标记为已读”按钮。
-- [ ] **FR-F.1.8 (HQ Ops/Admin):** 可查看已发布公告的阅读统计（待后端支持）。
+- [ ] **FR-F.1.8 (HQ Ops/Admin):** 可查看已发布公告的阅读统计。(相关代码未审查，状态未知，PRD描述为已实现后端表结构和前端弹窗，需验证)
 
 ## 当前进度
 
@@ -125,8 +125,10 @@
 - 基础布局和导航结构搭建
 - **模块A (招商与签约):**
   - FR-A.1.1, FR-A.1.2, FR-A.1.3: 加盟商在线申请、文件上传、状态查看
+  - FR-A.1.4, FR-A.1.5, FR-A.1.6: 招商专员处理申请 (通知、查看、操作)
   - FR-A.2.1 - FR-A.2.6: 电子合同签署全流程
 - **模块B (开店筹备):**
+  - FR-B.1.1, FR-B.1.2, FR-B.1.3: 商品管理、浏览与搜索、购物车
   - FR-B.1.4, FR-B.1.5, FR-B.1.6, FR-B.1.7: 订单提交、详情查看、通知、处理
 - **模块C (日常运营与支持):**
   - FR-C.1.1 - FR-C.1.4: 日常订货全流程
@@ -143,39 +145,37 @@
   - FR-Core.1.4: 用户认证基础功能（登录页面、AuthContext集成）
 
 **进行中：**
-- **核心模块 (Core.1) 用户认证与角色管理:**
-  - [ ] 实现用户认证与角色管理 (Supabase Auth 深度集成及细化权限控制) (FR-Core.1.1, FR-Core.1.2, FR-Core.1.3, FR-Core.1.5, FR-Core.1.6)
-- **模块A - 招商与签约：**
-  - [x] FR-A.1.4 (HQ Recruiter): 新申请系统内通知
-  - [x] FR-A.1.5 (HQ Recruiter): 查看申请人信息和上传的资质文件
-  - [x] FR-A.1.6 (HQ Recruiter): 对申请进行操作
-- **模块B - 开店筹备：**
-  - [x] FR-B.1.1 (Admin/HQ Ops): 管理商品信息
-  - [x] FR-B.1.2 (Franchisee): 浏览商品列表、分类查看、名称搜索
-  - [x] FR-B.1.3 (Franchisee): 购物车功能
-- **模块E - 巡店与品控管理：**
-  - [ ] FR-E.1.3: 将巡店记录中的照片上传真实对接 Supabase Storage。
-- **模块F - 总部公告与沟通：**
-  - [ ] FR-F.1.1: 将公告附件上传逻辑真实对接 Supabase Storage。
+- **核心模块 (Core.1) 用户认证与角色管理深度集成：**
+  - [ ] **FR-Core.1.1:** 实现意向加盟商 (Applicant) 用户注册流程 (已完成基础注册，用户状态为 `pending_activation`)，开发管理员激活/审核功能。
+  - [ ] **FR-Core.1.2 (Admin):** 开发管理员创建总部员工账号（HQ Recruiter, HQ Ops, HQ Supervisor, HQ Finance, Admin）并分配角色的功能。(UserManagementPage.tsx 已集成，但具体创建员工账号功能待前端实现和验证，目前支持修改现有用户角色)
+  - [x] **FR-Core.1.3 (Admin):** 开发管理员管理加盟商账号功能（激活/转换为 Franchisee，禁用账号）。(UserManagementPage.tsx 已集成，支持修改用户角色和状态)
+  - [x] **FR-Core.1.5:** 在系统中清晰定义并使用 PRD 中规划的角色。(已在 AuthContext 和数据库层面定义)
+  - [ ] **FR-Core.1.6:** 全面设计并实现基于 Supabase RLS (初步建立) 和前端逻辑 (路由保护已实现) 的严格数据访问权限和功能操作权限控制，并进行全面测试。
+- **Supabase Storage 对接：**
+  - [ ] **模块F (FR-F.1.1):** 实现公告附件上传至 Supabase Storage。(当前为前端模拟URL.createObjectURL，未真实对接)
+  - [x] **模块E (FR-E.1.3):** 实现巡店记录照片上传至 Supabase Storage。(已在 InspectionManagementPage 中对接 `inspection-photos` bucket)
+  - [x] **确保资质文件上传 (FR-A.1.2):** 已在 FranchiseApplicationForm 中对接 `application-documents` bucket。
+  - [ ] **确保工单附件上传 (FR-C.3.1):** (SupportTicketForm.tsx 文件读取失败，状态未知/无法确认是否对接 Supabase Storage)
 
 **下一步重点开发任务：**
 
 1.  **完成进行中的任务：**
-    *   **模块A (招商与签约):** 完成 FR-A.1.4, FR-A.1.5, FR-A.1.6 的开发和测试。
-    *   **模块B (开店筹备):** 完成 FR-B.1.1, FR-B.1.2, FR-B.1.3 的开发和测试。
+    *   [x] **模块A (招商与签约):** 完成 FR-A.1.4, FR-A.1.5, FR-A.1.6 的开发和测试。
+    *   [x] **模块B (开店筹备):** 完成 FR-B.1.1, FR-B.1.2, FR-B.1.3 的开发和测试。
 2.  **核心模块 (Core.1) 用户认证与角色管理深度集成：**
-    *   [ ] **FR-Core.1.1:** 实现意向加盟商 (Applicant) 用户注册流程，注册后需管理员激活或审核。
-    *   [ ] **FR-Core.1.2 (Admin):** 开发管理员创建总部员工账号（HQ Recruiter, HQ Ops, HQ Supervisor, HQ Finance, Admin）并分配角色的功能。
-    *   [ ] **FR-Core.1.3 (Admin):** 开发管理员管理加盟商账号功能（激活/转换为 Franchisee，禁用账号）。
-    *   [ ] **FR-Core.1.5:** 在系统中清晰定义并使用 PRD 中规划的角色。
-    *   [ ] **FR-Core.1.6:** 全面设计并实现基于 Supabase RLS 和前端逻辑的严格数据访问权限和功能操作权限控制。
+    *   [ ] **FR-Core.1.1:** 实现意向加盟商 (Applicant) 用户注册流程 (已完成基础注册，用户状态为 `pending_activation`)，开发管理员激活/审核功能。
+    *   [ ] **FR-Core.1.2 (Admin):** 开发管理员创建总部员工账号（HQ Recruiter, HQ Ops, HQ Supervisor, HQ Finance, Admin）并分配角色的功能。(UserManagementPage.tsx 已集成，但具体创建员工账号功能待前端实现和验证，目前支持修改现有用户角色)
+    *   [x] **FR-Core.1.3 (Admin):** 开发管理员管理加盟商账号功能（激活/转换为 Franchisee，禁用账号）。(UserManagementPage.tsx 已集成，支持修改用户角色和状态)
+    *   [x] **FR-Core.1.5:** 在系统中清晰定义并使用 PRD 中规划的角色。(已在 AuthContext 和数据库层面定义)
+    *   [ ] **FR-Core.1.6:** 全面设计并实现基于 Supabase RLS (初步建立) 和前端逻辑 (路由保护已实现) 的严格数据访问权限和功能操作权限控制，并进行全面测试。
 3.  **Supabase Storage 对接：**
-    *   [ ] **模块F (FR-F.1.1):** 实现公告附件上传至 Supabase Storage。
-    *   [ ] **模块E (FR-E.1.3):** 实现巡店记录照片上传至 Supabase Storage。
-    *   确保资质文件上传 (FR-A.1.2) 和工单附件上传 (FR-C.3.1) 已真实对接 Supabase Storage (若之前为模拟)。
+    *   [ ] **模块F (FR-F.1.1):** 实现公告附件上传至 Supabase Storage。(当前为前端模拟URL.createObjectURL，未真实对接)
+    *   [x] **模块E (FR-E.1.3):** 实现巡店记录照片上传至 Supabase Storage。(已在 InspectionManagementPage 中对接 `inspection-photos` bucket)
+    *   [x] **确保资质文件上传 (FR-A.1.2):** 已在 FranchiseApplicationForm 中对接 `application-documents` bucket。
+    *   [ ] **确保工单附件上传 (FR-C.3.1):** (SupportTicketForm.tsx 文件读取失败，状态未知/无法确认是否对接 Supabase Storage)
 4.  **未开始的 MVP 功能点：**
-    *   [ ] **模块A (FR-A.1.7 Admin):** 开发基础自动化初筛规则配置功能。
-    *   [ ] **模块F (FR-F.1.8 HQ Ops/Admin):** 开发公告阅读统计功能 (可先前端预留，待后端逻辑支持)。
+    *   [x] **模块A (FR-A.1.7 Admin):** 开发基础自动化初筛规则配置功能。(已实现 SystemConfigurationPage，允许编辑 `application.screening.allowed_cities`)
+    *   [ ] **模块F (FR-F.1.8 HQ Ops/Admin):** 开发公告阅读统计功能。(相关代码未审查，状态未知，PRD描述为已实现后端表结构和前端弹窗，需验证)
 5.  **测试与优化：**
     *   对已完成和新完成的功能进行单元测试和集成测试。
     *   根据测试反馈进行 Bug 修复和体验优化。

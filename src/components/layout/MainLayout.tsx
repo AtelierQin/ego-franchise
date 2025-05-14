@@ -52,6 +52,7 @@ const MainLayout = ({ children, userRole }: MainLayoutProps) => {
         return [
           { name: '用户管理', path: '/admin/users' },
           { name: '角色管理', path: '/admin/roles' },
+          { name: '系统配置', path: '/admin/system-configurations' },
           { name: '申请管理', path: '/admin/applications' },
           { name: '合同管理', path: '/admin/contracts' },
           { name: '商品管理', path: '/admin/products' },
